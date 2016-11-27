@@ -10,6 +10,7 @@ dpdt=@(pa)((1-pa/10).*pa);
 
 
 
+
 % Solution to Exercise 1
 
 t = [0:.1:6];
@@ -23,7 +24,7 @@ plot(t,pop(t))
 %Function returns computed and exact values
 
 tic 
-E=Euler(1,5)
+E=Euler(1,5);
 toc
 
 
@@ -39,8 +40,9 @@ toc
 
 
 %Question 2 part C
-%matrix "Errors" is a matrix with header row time increments 
-% Subsequent rows are RMS errors for each method Euler Heun and RK4
+%matrix "Errors" is a matrix
+%Column headers are time increments
+%Rows are RMS errors for each method Euler Heun and RK4 in that order
 
 for n=1:4
     j=1/2^(n-1);
@@ -53,6 +55,7 @@ end
 Errors
 
 %Question 2 part D
+
 FactorImprovement=zeros(3,3);
 for j=1:3
     for i=1:3
@@ -65,39 +68,50 @@ FactorImprovement
 % ErrorEst is a matrix with header row time increments 
 % Subsequent rows are RMS errors for each method Euler Heun and RK4
 
-for n=1:4
-    j=1/2^(n-1);
-ErrorsEstimate(1,n) = j;
-ErrorsEstimate(2,n) = errEst( Euler(j,5) ); 
-ErrorsEstimate(3,n) = errEst( Heun(j,5) );
-ErrorsEstimate(4,n) = errEst( RungeKutta(j,5) );
+
+
+%this function takes a function handle
+%iteratues though the funcctions calculating the
+%errors at time steps 1 1/2 1/4  and 1/8
+%then using the time step of 1/8 as the exact solution calculates
+%the esitmated error
+
+
+t_inc=@(t)(1./2.^t);
+C ={ @Euler @Heun @RungeKutta };
+
+for i=1:3,  %iterate over the functions
+    for j=3:-1:0;
+ for time = t_inc([j])   %iterate over the time elements starting from 1/8
+  A = C{i}(time,5);  %evaluate method with best time t=1/8
+if j==3
+    estimate = A;  %store fine mesh (t=1/8) matrix as a lookup table
+    global_error_estimate(i,j)= err (A) %Fetch the errors t=1/8
+else
+    %TODO get errors uing matrix estimate as the benchmark
 end
-ErrorsEstimate
-
-
-Estimated_Factor_Improvement=zeros(3,3);
-for j=1:3
-    for i=1:3
-    Estimated_Factor_Improvement(i,j) = ErrorsEstimate(i+1,j)/ErrorsEstimate(i+1,j+1);
+end
     end
 end
-Estimated_Factor_Improvement
-
-
-
 
 
 
 function A = Euler( dt, tEnd )
+%our implementation of the Euler method.
+% ** two additional columns added after computed solution ***
+%the second column is the exact solution 
+%and the thrid column is the corresponding time point
+
 global pop dpdt
 t=0:dt:tEnd-dt;
-A=zeros((length(t)),2);     %Initialise matrix
+A=zeros((length(t)),3);     %Initialise matrix
 A(1,1) = 1;                   %Initial Population
 
 for i=1:(length(t))
     A(i+1,1)= A(i,1) + dt * dpdt( A(i,1) );    
 end
    A(:,2)= pop( 0:dt:dt*(length(t)) );   %analytic solution on second column
+   A(:,3)= 0:dt:dt*(length(t));         %time from t=0 on third column.
    A = A(2:end,:);                      %delete the initial conditions
 end
 
@@ -105,7 +119,7 @@ end
 function A = Heun( dt, tEnd )
 global pop dpdt
 t=0:dt:tEnd-dt;
-A=zeros((length(t)),2);
+A=zeros((length(t)),3);
 A(1,1) = 1; %Initial Population
 
 for i=1:(length(t))
@@ -114,8 +128,11 @@ for i=1:(length(t))
     k2 = dpdt( p1 );
     A(i+1,1)= A(i,1) + dt/2 * ( k1 + k2 );    
 end
-   A(:,2)= pop( 0:dt:dt*(length(t)) );   
-   A = A(2:end,:);            
+
+   A(:,2)= pop( 0:dt:dt*(length(t)) );  
+   A(:,3)= 0:dt:dt*(length(t)); 
+   A = A(2:end,:); 
+   
 end
 
 
@@ -135,7 +152,8 @@ for i=1:(length(t))
     k4 = dpdt( p3 );
     A(i+1,1)= A(i,1) + dt/6 * ( k1 + 2*k2 + 2*k3 + k4);    
 end
-   A(:,2)= pop( 0:dt:dt*(length(t)) );  
+   A(:,2)= pop( 0:dt:dt*(length(t)) );
+   A(:,3)= 0:dt:dt*(length(t)); 
    A = A(2:end,:);              
 end
 
@@ -144,7 +162,7 @@ function e = err( A )
 %between the gradient method computation and
 %the exact analytic solution.
 %input matrix has 2 columns, Frist column is gradient approximation 
-%and second is the 
+%and second is the exact anaytic solution
 global pop
 S=0; %sum of dif squared
 for i=1:size(A,1)
@@ -154,18 +172,5 @@ e = sqrt( 1/size(A,1) * S );
 
 end
 
-
-function e = errEst( A ) 
-%This function Isnt working.  It's supposed to calculate the 
-%estimated error without th analytic solution!  :(
-global pop
-S=0; %sum of dif squared
-for i=1:size(A,1)
-    smallest_error = abs( A(end,1) - A(end-1,1) );
-    S = S + ( A(i,1) - smallest_error )^2;
-end
-e = sqrt( 1/size(A,1) * S );
-
-end
 
 
