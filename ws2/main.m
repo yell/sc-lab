@@ -1,6 +1,21 @@
 % rhs
 f = @(t, p) (1 - p./10) .* p;
 
+% time endpoint
+t_end = 5;
+
+% initial condition
+p0 = 1;
+
+% step sizes
+dt = [1, 0.5, 0.25, 0.125];
+
+% numerical methods
+num_methods = { @explicit_euler, @heun, @rk4 };
+
+% for plotting
+num_methods_strs = { 'Explicit Euler', 'Heun', 'Runge-Kutta (4th order)' };
+
 % exact solution
 p_exact_f = @(t) 10 ./ (1 + 9 .* exp(-t));
 
@@ -9,21 +24,6 @@ t_exact = 0:0.01:t_end;
 
 % exact solution evaluated on the respective domain 
 p_exact = p_exact_f(t_exact)';
-
-% initial condition
-p0 = 1;
-
-% step sizes
-dt = [1, 0.5, 0.25, 0.125];
-
-% time endpoint
-t_end = 5;
-
-% numerical methods
-num_methods = { @explicit_euler, @heun, @rk4 };
-
-% for plotting
-num_methods_strs = { 'Explicit Euler', 'Heun', 'Runge-Kutta (4th order)' };
 
 
 % main loop
@@ -65,7 +65,7 @@ for i = 1:numel(num_methods)
 	fprintf('\n error approx. ');
 	for j = 1:numel(dt)
 		p_ref = P_collection{numel(dt)}; % the most precise approximation
-		K = int8(dt(j)/dt(numel(dt))) ;  % skip every K-th element of p_ref,
+		K = int8(dt(j)/dt(numel(dt)));   % skip every K-th element of p_ref,
 		p_ref = p_ref(1:K:numel(p_ref)); % ... in order for dimensions to be matched
 		p_approx = P_collection{j};
 		E_approx = approximation_error(p_ref, p_approx, dt(j), t_end);
