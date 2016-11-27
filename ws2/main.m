@@ -42,7 +42,7 @@ for i = 1:numel(num_methods)
 	end
 
 	% plot and save the image to the root folder
-	% plot_comparison(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i});
+	plot_comparison(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i});
 
 	% print error values
 	fprintf('\n\n');
