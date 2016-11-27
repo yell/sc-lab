@@ -29,7 +29,7 @@ end
 
 % swap domain endpoints if needed
 if t_begin > t_end
-	[t_begin, t_end] = deal(t_end, t_begin)
+	[t_begin, t_end] = deal(t_end, t_begin);
 end
 
 z = y_ref - y_approx;
