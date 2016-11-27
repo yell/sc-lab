@@ -14,10 +14,10 @@ dt = [1, 0.5, 0.25, 0.125];
 t_end = 5;
 
 % numerical methods
-num_methods = { @explicit_euler };
+num_methods = { @explicit_euler, @heun, @rk4 };
 
 % for plotting
-num_methods_strs = { 'Explicit Euler' };
+num_methods_strs = { 'Explicit Euler', 'Heun', 'Runge-Kutta (4th order)' };
 
 % time points for exact solution
 t_exact = 0:0.01:t_end;
@@ -37,6 +37,6 @@ for i = 1:numel(num_methods)
 		labels(j) = strcat(num_methods_strs{i}, ', dt = ', num2str(dt(j)));
 	end
 
-	% plot and save to the root folder
+	% plot and save the image to the root folder
 	plot_comparison(t_exact, p_exact(t_exact), T_collection, P_collection, labels, num_methods_strs{i});
 end
