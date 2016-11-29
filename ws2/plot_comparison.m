@@ -9,11 +9,13 @@ t_exact, y_exact : vector of floats
 	time points and values of the exact solution
 T_approx, Y_approx : cell array of vector of floats
 	time points and values of the approximation
-labels : cell array of strings
-	labels of corresponding approximation methods
+labels : vector of strings
+	labels of the corresponding approximation methods
 title_str : string
 	title of the plot
 %}
+fig = figure;
+
 plot(t_exact, y_exact, '-k', 'LineWidth', 2);
 for i=1:numel(T_approx)
 	hold on;
@@ -28,5 +30,4 @@ legend(['Exact solution'; labels], 'Location','Best');
 grid on;
 
 res = 169;
-fig = gcf;
 print(fig, title_str, '-dpng', strcat('-r', num2str(res)));

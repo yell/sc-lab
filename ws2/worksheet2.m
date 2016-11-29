@@ -1,3 +1,6 @@
+clc
+clear
+
 % rhs
 f = @(t, p) (1 - p./10) .* p;
 
@@ -25,6 +28,9 @@ t_exact = 0:0.01:t_end;
 % exact solution evaluated on the respective domain 
 p_exact = p_exact_f(t_exact)';
 
+% plot the exact solution alone
+% plot_comparison(t_exact, p_exact, {}, {}, [], 'Exact solution');
+
 
 % main loop
 for i = 1:numel(num_methods)
@@ -42,7 +48,7 @@ for i = 1:numel(num_methods)
 	end
 
 	% plot and save the image to the root folder
-	plot_comparison(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i});
+	% plot_comparison(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i});
 
 	% print error values
 	fprintf('\n\n');
@@ -54,19 +60,31 @@ for i = 1:numel(num_methods)
 		fprintf('|     %1.4f ', dt(j));
 	end
 
+	E = zeros(numel(dt), 1);
 	fprintf('\n         error ');
 	for j = 1:numel(dt)
 		p_ref = p_exact_f(T_collection{j})';
 		p_approx = P_collection{j};
-		E = approximation_error(p_ref, p_approx, dt(j), t_end);
-		fprintf('| %1.4e ', E);
+		E(j) = approximation_error(p_ref, p_approx, dt(j), t_end);
+		fprintf('| %1.4e ', E(j));
+	end
+
+	fprintf('\n    error red. ');
+	for j = 1:numel(dt)
+		if j == 1
+			fprintf('|          - ', E);	
+		else
+			fprintf('|   %8.5f ', E(j - 1)/E(j));	
+		end
 	end
 
 	fprintf('\n error approx. ');
 	for j = 1:numel(dt)
 		p_ref = P_collection{numel(dt)}; % the most precise approximation
-		K = int8(dt(j)/dt(numel(dt)));   % skip every K-th element of p_ref,
-		p_ref = p_ref(1:K:numel(p_ref)); % ... in order for dimensions to be matched
+		% now skip every K-th element of p_ref,
+		K = int8(dt(j)/dt(numel(dt)));   
+		% ... in order for dimensions (and time points) to be matched
+		p_ref = p_ref(1:K:numel(p_ref)); 
 		p_approx = P_collection{j};
 		E_approx = approximation_error(p_ref, p_approx, dt(j), t_end);
 		fprintf('| %1.4e ', E_approx);
