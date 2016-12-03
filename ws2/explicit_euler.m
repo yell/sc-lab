@@ -33,7 +33,7 @@ end
 
 % swap domain endpoints if needed
 if t_begin > t_end
-	[t_begin, t_end] = deal(t_end, t_begin)
+	[t_begin, t_end] = deal(t_end, t_begin);
 end
 
 T = t_begin:dt:t_end;
