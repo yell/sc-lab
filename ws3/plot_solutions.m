@@ -25,9 +25,11 @@ hold off;
 
 xlabel('t');
 ylabel('y(t)');
+ylim([0 20]);
 title(title_str);
 legend(['Exact solution'; labels], 'Location','Best');
 grid on;
 
-res = 169;
+set(fig, 'Position', [100, 100, 960, 640]);
+res = 144;
 print(fig, title_str, '-dpng', strcat('-r', num2str(res)));
