@@ -1,4 +1,4 @@
-function plot_comparison(t_exact, y_exact, T_approx, Y_approx, labels, title_str)
+function plot_solutions(t_exact, y_exact, T_approx, Y_approx, labels, title_str)
 %{
 Plot exact solution along with approximations to it and
 store as png image to the root
