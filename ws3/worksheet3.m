@@ -37,7 +37,7 @@ t_exact = 0:0.01:t_end;
 p_exact = p_exact_f(t_exact)';
 
 % plot the exact solution alone
-% plot_solutions(t_exact, p_exact, {}, {}, [], 'Exact solution');
+plot_solutions(t_exact, p_exact, {}, {}, [], 'Exact solution');
 
 
 % main loop
@@ -76,7 +76,7 @@ for i = 1:numel(num_methods)
 		end
 
 		% plot and save the image to the root folder
-		% plot_solutions(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i}{j});
+		plot_solutions(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i}{j});
 
 		% print error values
 		fprintf('\n\n');
