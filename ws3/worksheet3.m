@@ -48,14 +48,16 @@ for i = 1:numel(num_methods)
 		% needed for plotting
 		T_collection = cell(numel(dt), 1);
 		P_collection = cell(numel(dt), 1);
+		exitflags = zeros(numel(dt), 1);
 		labels = strings(numel(dt), 1);
 
 		for k = 1:numel(dt)
 			switch i
 			case 1 % explicit
-				[T, P] = num_methods{i}{j}(f, p0, dt(k), t_end);
+				[T, P, F] = num_methods{i}{j}(f, p0, dt(k), t_end);
 			case 2 % implicit
-				[T, P] = num_methods{i}{j}(f, p0, fprime, dt(k), t_end);
+				[T, P, F, exitflag] = num_methods{i}{j}(f, p0, fprime, dt(k), t_end);
+				exitflags(k) = exitflag;
 			case 3 % linearized
 				[T, P] = num_methods{i}{j}(p0, dt(k), t_end);
 			end
@@ -75,5 +77,45 @@ for i = 1:numel(num_methods)
 
 		% plot and save the image to the root folder
 		plot_solutions(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i}{j});
+
+		% print error values
+		fprintf('\n\n');
+		fprintf('%s\n', num_methods_strs{i}{j});
+		fprintf(repmat('-', 1, 75));
+
+		fprintf('\n        dt ');
+		for j = 1:numel(dt)
+			fprintf('|     %1.4f ', dt(j));
+		end
+
+		E = zeros(numel(dt), 1);
+		fprintf('\n     error ');
+		for k = 1:numel(dt)
+			p_ref = p_exact_f(T_collection{k})';
+			p_approx = P_collection{k};
+			if exitflags(k) < 0
+				E(k) = inf;
+				fprintf('|          - ');
+			else	
+				E(k) = approximation_error(p_ref, p_approx, dt(k), t_end);
+				if isinf(E(k))
+					fprintf('|        inf ');
+				else	
+					fprintf('| %1.4e ', E(k));
+				end
+			end
+		end
+
+		fprintf('\nerror red. ');
+		for k = 1:numel(dt)
+			if (k == 1 | isinf(E(k - 1)))
+				fprintf('|          - ', E);	
+			else
+				fprintf('|   %8.5f ', E(k - 1)/E(k));	
+			end
+		end
+
+		fprintf('\n');
+
 	end
 end
