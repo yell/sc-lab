@@ -37,7 +37,7 @@ t_exact = 0:0.01:t_end;
 p_exact = p_exact_f(t_exact)';
 
 % plot the exact solution alone
-plot_solutions(t_exact, p_exact, {}, {}, [], 'Exact solution');
+% plot_solutions(t_exact, p_exact, {}, {}, [], 'Exact solution');
 
 
 % main loop
@@ -76,7 +76,7 @@ for i = 1:numel(num_methods)
 		end
 
 		% plot and save the image to the root folder
-		plot_solutions(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i}{j});
+		% plot_solutions(t_exact, p_exact, T_collection, P_collection, labels, num_methods_strs{i}{j});
 
 		% print error values
 		fprintf('\n\n');
@@ -84,8 +84,8 @@ for i = 1:numel(num_methods)
 		fprintf(repmat('-', 1, 75));
 
 		fprintf('\n        dt ');
-		for j = 1:numel(dt)
-			fprintf('|     %1.4f ', dt(j));
+		for k = 1:numel(dt)
+			fprintf('|     %1.4f ', dt(k));
 		end
 
 		E = zeros(numel(dt), 1);
@@ -95,7 +95,7 @@ for i = 1:numel(num_methods)
 			p_approx = P_collection{k};
 			if exitflags(k) < 0
 				E(k) = inf;
-				fprintf('|          - ');
+				fprintf('|        N/A ');
 			else	
 				E(k) = approximation_error(p_ref, p_approx, dt(k), t_end);
 				if isinf(E(k))
@@ -109,13 +109,47 @@ for i = 1:numel(num_methods)
 		fprintf('\nerror red. ');
 		for k = 1:numel(dt)
 			if (k == 1 | isinf(E(k - 1)))
-				fprintf('|          - ', E);	
+				fprintf('|        N/A ', E);
 			else
 				fprintf('|   %8.5f ', E(k - 1)/E(k));	
 			end
 		end
 
-		fprintf('\n');
+		fprintf('\n stability ');
+		for k = 1:numel(dt)
+			if exitflags(k) < 0
+				stable = false;
+			else
+				dp0 = 1e-4 * p0 * abs(p0) / (1 + abs(p0));
+				p1 = p0 + dp0;
 
+				switch i
+				case 1 % explicit
+					[T1, P1, F1, exitflag] = num_methods{i}{j}(f, p1, dt(k), t_end);
+				case 2 % implicit
+					[T1, P1, F1, exitflag] = num_methods{i}{j}(f, p1, fprime, dt(k), t_end);
+				case 3 % linearized
+					[T1, P1, exitflag] = num_methods{i}{j}(p1, dt(k), t_end);
+				end
+
+				if exitflag < 0;
+					stable = false;
+				else	
+					S = norm(P1 - P_collection{k}, inf);
+					if S > dp0 * (1 + 1e-4)
+						stable = false;
+					else
+						stable = true;	
+					end
+				end
+			end
+			if stable
+				fprintf('|          + ');
+			else
+				fprintf('|          - ');
+			end
+		end
+
+		fprintf('\n');
 	end
 end
