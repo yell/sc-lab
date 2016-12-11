@@ -120,7 +120,7 @@ for i = 1:numel(num_methods)
 			if exitflags(k) < 0
 				stable = false;
 			else
-				dp0 = 1e-4 * p0 * abs(p0) / (1 + abs(p0));
+				dp0 = 1e-4 * abs(p0) * abs(p0) / (1 + abs(p0));
 				p1 = p0 + dp0;
 
 				switch i
