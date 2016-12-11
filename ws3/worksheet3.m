@@ -17,13 +17,13 @@ dt = 2 .^ (-1:-1:-5); % 1/2, ..., 1/32
 
 % numerical methods
 explicit_methods = { @explicit_euler, @heun };
-implicit_methods = { @implicit_euler };
+implicit_methods = { @implicit_euler, @adams_moulton2 };
 num_methods = { explicit_methods, implicit_methods };
 
 % for plotting
 explicit_methods_strs = { 'Explicit Euler', 'Heun' };
-implicit_methods_strs = { 'Implicit Euler' };
-num_methods_strs = { explicit_methods_strs, implicit_methods_strs }
+implicit_methods_strs = { 'Implicit Euler', 'Adams-Moulton (2nd order)' };
+num_methods_strs = { explicit_methods_strs, implicit_methods_strs };
 
 % exact solution
 p_exact_f = @(t) 200 ./ (20 - 10 .* exp(-7 * t));
@@ -62,7 +62,7 @@ for i = 1:numel(num_methods)
 
 		% for explicit compute also for dt = 1
 		if i == 1
-			k = numel(dt) + 1
+			k = numel(dt) + 1;
 			[T, P] = num_methods{i}{j}(f, p0, 1, t_end);
 			T_collection{k} = T;
 			P_collection{k} = P;

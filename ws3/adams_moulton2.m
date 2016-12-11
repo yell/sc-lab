@@ -1,6 +1,6 @@
-function [T, Y, F, exitflag] = implicit_euler(f, y0, fprime, dt, t_begin, t_end)
+function [T, Y, F, exitflag] = adams_moulton2(f, y0, fprime, dt, t_begin, t_end)
 %{
-Solve ODE y'(t) = f(t, y(t)) using implicit Euler scheme.
+Solve ODE y'(t) = f(t, y(t)) using (implicit) second-order Adams-Moulton scheme.
 
 Parameters
 ----------
@@ -26,7 +26,7 @@ Y : vector of floats
 F : vector of floats
 	Computed values of f(t_k, y_k).
 exitflag : int
-	encodes the exit condition, meaning the reason `implicit_euler` 
+	encodes the exit condition, meaning the reason `adams_moulton2` 
 	stopped its iteratons.
 	 0 : success
 	-1 : unable to solve the respective equation at some step
@@ -49,8 +49,8 @@ F = [];
 for i = 1:(n - 1)
 	F = [F; f( T(i), Y(i) )];
 
-	G = @(y) y - dt * f( T(i + 1), y ) - Y(i);
-	Gprime = @(y) 1 - dt * fprime( T(i + 1), y );
+	G = @(y) y - dt/2 * ( f(T(i + 1), y) + F(i) ) - Y(i);
+	Gprime = @(y) 1 - dt/2 * fprime( T(i + 1), y );
 
 	[y, exitflag] = newton(G, Y(i), Gprime);
 	if exitflag < 0
