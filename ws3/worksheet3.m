@@ -108,8 +108,10 @@ for i = 1:numel(num_methods)
 
 		fprintf('\nerror red. ');
 		for k = 1:numel(dt)
-			if (k == 1 | isinf(E(k - 1)))
-				fprintf('|        N/A ', E);
+			if k == 1
+				fprintf('|          - ');
+			elseif isinf(E(k - 1))
+				fprintf('|        N/A ');
 			else
 				fprintf('|   %8.5f ', E(k - 1)/E(k));	
 			end
