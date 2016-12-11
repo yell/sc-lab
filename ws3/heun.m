@@ -1,4 +1,4 @@
-function [T, Y, F] = heun(f, y0, dt, t_begin, t_end)
+function [T, Y, F, exitflag] = heun(f, y0, dt, t_begin, t_end)
 %{
 Solve ODE y'(t) = f(t, y(t)) using (explicit) Heun scheme.
 
@@ -20,11 +20,14 @@ Returns
 T : vector of floats
 	Time points for which approximation to the solution is evaluated
 Y : vector of floats
-	Computed values of y_k. Length is n, where
-	n = |t_begin:dt:t_end| = floor( (t_end - t_begin)/dt + 1 ).
-F : matrix of size (n - 1, 2) of floats
-	Computed values of f(t_k, y_k). One of dimensions is (n - 1), 
-	since the evaluation at last time point is not necessary.
+	Computed values of y_k.
+F : matrix of size (m, 2) of floats
+	Computed values of f(t_k, y_k).
+exitflag : int
+	encodes the exit condition, meaning the reason `implicit_euler` 
+	stopped its iteratons.
+	 0 : success
+	-1 : NaN or Inf function value was encountered
 %}
 if nargin < 5
 	t_end = t_begin;
@@ -38,13 +41,21 @@ end
 
 T = t_begin:dt:t_end;
 n = numel(T);
-Y = zeros(n, 1);
-F = zeros(n - 1, 2);
-
-Y(1) = y0;
+Y = [y0];
+F = [];
+exitflag = 0;
 
 for i = 1:(n - 1)
-	F(i, 1) = f( T(i), Y(i) );
-	F(i, 2) = f( T(i) + dt, Y(i) + dt * F(i, 1) );
-	Y(i + 1) = Y(i) + dt/2 * (F(i, 1) + F(i, 2));
+	f1 = f( T(i), Y(i) );
+	f2 = f( T(i) + dt, Y(i) + dt * f1 );
+	F = [F; [f1, f2]];
+
+	y = Y(i) + dt/2 * (F(i, 1) + F(i, 2));
+	if (isinf(y) | isnan(y))
+		exitflag = -1;
+		T = T(1:numel(Y));
+		return;
+	end
+	
+	Y = [Y; y];
 end

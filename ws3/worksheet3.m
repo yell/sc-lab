@@ -54,13 +54,13 @@ for i = 1:numel(num_methods)
 		for k = 1:numel(dt)
 			switch i
 			case 1 % explicit
-				[T, P, F] = num_methods{i}{j}(f, p0, dt(k), t_end);
+				[T, P, F, exitflag] = num_methods{i}{j}(f, p0, dt(k), t_end);
 			case 2 % implicit
 				[T, P, F, exitflag] = num_methods{i}{j}(f, p0, fprime, dt(k), t_end);
-				exitflags(k) = exitflag;
 			case 3 % linearized
-				[T, P] = num_methods{i}{j}(p0, dt(k), t_end);
+				[T, P, exitflag] = num_methods{i}{j}(p0, dt(k), t_end);
 			end
+			exitflags(k) = exitflag;
 			T_collection{k} = T;
 			P_collection{k} = P;
 			labels(k) = strcat(num_methods_strs{i}{j}, ', dt = ', num2str(dt(k)));

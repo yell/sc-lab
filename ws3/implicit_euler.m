@@ -47,14 +47,14 @@ Y = [y0];
 F = [];
 
 for i = 1:(n - 1)
-	F = [F; f( T(i), Y(i) )];
+	F = [ F; f(T(i), Y(i)) ];
 
 	G = @(y) y - dt * f( T(i + 1), y ) - Y(i);
 	Gprime = @(y) 1 - dt * fprime( T(i + 1), y );
 
 	[y, exitflag] = newton(G, Y(i), Gprime);
 	if exitflag < 0
-		exitflag = -1;
+		exitflag = -2;
 		T = T(1:numel(Y));
 		return;
 	end
