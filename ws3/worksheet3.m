@@ -18,13 +18,13 @@ dt = 2 .^ (-1:-1:-5); % 1/2, ..., 1/32
 % numerical methods
 explicit_methods = { @explicit_euler, @heun };
 implicit_methods = { @implicit_euler, @adams_moulton2 };
-linearized_methods = { @adams_moulton2_L1 };
+linearized_methods = { @adams_moulton2_L1, @adams_moulton2_L2 };
 num_methods = { explicit_methods, implicit_methods, linearized_methods };
 
 % for plotting
 explicit_methods_strs = { 'Explicit Euler', 'Heun' };
 implicit_methods_strs = { 'Implicit Euler', 'Adams-Moulton (2nd order)' };
-linearized_methods_strs = { 'Adams-Moulton Linearized v1' }
+linearized_methods_strs = { 'Adams-Moulton Linearized v1', 'Adams-Moulton Linearized v2' };
 num_methods_strs = { explicit_methods_strs, implicit_methods_strs, linearized_methods_strs };
 
 % exact solution
