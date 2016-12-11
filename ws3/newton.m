@@ -1,6 +1,7 @@
-function [root, iter, exitflag] = newton(f, x0, fprime, params)
+function [root, exitflag, iter] = newton(f, x0, fprime, params)
 %{
-Find root f(x) = 0 of a scalar function using Newton's method:
+Find root of the equation f(x) = 0 for a scalar function `f` 
+using Newton's method:
 
                    f(x_n)
 x_{n + 1} = x_n - -------
@@ -30,7 +31,7 @@ root : float
 iter : int
 	number of iterations performed
 exitflag : int
-	encodes the exit condition, meaning the reason `newton_scalar` 
+	encodes the exit condition, meaning the reason `newton` 
 	stopped its iteratons.
 	 0 : success
 	-1 : maximum number of iterations reached

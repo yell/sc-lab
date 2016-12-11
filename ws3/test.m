@@ -7,4 +7,4 @@ fprime = @(x) 2 * x;
 % newton(f, x0, fprime, {'fopt', 1e-2})
 % newton(f, x0, fprime, {'maxiter', 100})
 % newton(f, x0, fprime, {'xopt', 1e-2, 'maxiter', 100})
-[root, iter, exitflag] = newton(f, x0, df, {'maxiter', 200})
+[root, exitflag, iter] = newton(f, x0, df, {'maxiter', 200})
