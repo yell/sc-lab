@@ -1,2 +1,2 @@
-tar -cf ws3_group7.tar *
-tar -xf ws3_group7.tar
+tar -cf wsN_group7.tar *
+tar -xf wsN_group7.tar

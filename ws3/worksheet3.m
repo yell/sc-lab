@@ -122,7 +122,8 @@ for i = 1:numel(num_methods)
 			if exitflags(k) < 0
 				stable = false;
 			else
-				dp0 = 1e-4 * abs(p0) * abs(p0) / (1 + abs(p0));
+				eps_p0 = 1e-4;
+				dp0 = eps_p0 * abs(p0) * abs(p0) / (1 + abs(p0));
 				p1 = p0 + dp0;
 
 				switch i
@@ -137,12 +138,10 @@ for i = 1:numel(num_methods)
 				if exitflag < 0;
 					stable = false;
 				else	
-					S = norm(P1 - P_collection{k}, inf);
-					if S > dp0 * (1 + 1e-4)
-						stable = false;
-					else
-						stable = true;	
-					end
+					offset = 10;
+					S = norm(P1(offset:numel(P1)) - P_collection{k}(offset:numel(P1)), inf);
+					C = 1.25;
+                    stable = (S <= C * dp0);
 				end
 			end
 			if stable
