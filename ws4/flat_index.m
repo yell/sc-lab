@@ -11,6 +11,32 @@ m, n : positive int
 column_major : bool, optional
 	Whether the matrix is flattened column-wisely 
 	(otherwise row-wisely).
+
+Examples
+--------
++---+---+---+
+| 1 | 2 | 3 |
++---+---+---+
+| 4 | 5 | 6 |
++---+---+---+
+
+>> flat_index(2, 2, 2, 3, true)
+
+ans =
+
+     5
+
++---+---+---+
+| 1 | 3 | 5 |
++---+---+---+
+| 2 | 4 | 6 |
++---+---+---+
+
+>> flat_index(2, 2, 2, 3, false)
+
+ans =
+
+     4
 %}
 if nargin < 5
 	column_major = true;
