@@ -26,8 +26,10 @@ Parameters
 sz : positive int or (int, int) tuple
 	Govern dimensions of discretization grid.
 	`sz` == [N_x, N_y] or `sz` == [N_x], then N_y := N_x.
-rhs : 2-ary function, optional
-	Rhs of Poisson equation. If provided, `b` is computed. Default is false.
+compute_A : bool, optional
+	Whether to compute `A`. Default is true.
+f : 2-ary function, optional
+	Rhs of Poisson equation. If provided, `b` is computed. Default is none.
 sparse : bool, optional
 	Whether to return sparse matrix (`A`). Default is true.
 
@@ -40,15 +42,18 @@ b : (N,) vector, optional
 %}
 
 % set default values
-rhs = [];
+f = [];
+compute_A = true;
 sparse_matrix = true;
 
 % process optional parameters
 if nargin == 2
 	for i = 1:2:numel(params)
 		switch params{i}
-		case 'rhs'
-			rhs = params{i + 1};
+		case 'f'
+			f = params{i + 1};
+		case 'compute_A'
+			compute_A = params{i + 1};
 		case 'sparse'
 			sparse_matrix = params{i + 1};
 		otherwise
@@ -57,8 +62,13 @@ if nargin == 2
 	end
 end
 
+% ensure we actually compute something
+compute_rhs = ~isempty(f);
+if (compute_A == false) && (compute_rhs == false)
+	error('either `compute_A` must be true or `f` must be provided');
+end
+
 % set some variables for convenience
-compute_rhs = ~isempty(rhs);
 if numel(sz) == 1
 	[N_x] = sz;
 	N_y = N_x;
@@ -73,12 +83,18 @@ N = N_x * N_y;
 C_x = (1 + N_x) ^ 2;
 C_y = (1 + N_y) ^ 2;
 
-% initialize variables to return
-if sparse_matrix
-	A = sparse(N, N);
+% initialize `A`
+if compute_A
+	if sparse_matrix
+		A = sparse(N, N);
+	else
+		A = zeros(N);
+	end
 else
-	A = zeros(N);
+	A = false;
 end
+
+% initialize `b`
 if compute_rhs
 	b = zeros(N, 1);
 else
@@ -89,23 +105,25 @@ end
 for i = 1:N_y
 	for j = 1:N_x
 		current_row = flat_index(i, j, N_y, N_x); % == (i - 1) * N_x + j
-		A( current_row, current_row ) = -2 * (C_x + C_y);
-		if i > 1
-			A( current_row, flat_index(i - 1, j, N_y, N_x) ) = C_x;
-		end
-		if i < N_y
-			A( current_row, flat_index(i + 1, j, N_y, N_x) ) = C_x;
-		end
-		if j > 1
-			A( current_row, flat_index(i, j - 1, N_y, N_x) ) = C_y;
-			% flat_index(i, j - 1, ...) == current_row - 1
-		end
-		if j < N_x
-			A( current_row, flat_index(i, j + 1, N_y, N_x) ) = C_y;
-			% flat_index(i, j + 1, ...) == current_row + 1
+		if compute_A
+			A( current_row, current_row ) = -2 * (C_x + C_y);
+			if i > 1
+				A( current_row, flat_index(i - 1, j, N_y, N_x) ) = C_x;
+			end
+			if i < N_y
+				A( current_row, flat_index(i + 1, j, N_y, N_x) ) = C_x;
+			end
+			if j > 1
+				A( current_row, flat_index(i, j - 1, N_y, N_x) ) = C_y;
+				% flat_index(i, j - 1, ...) == current_row - 1
+			end
+			if j < N_x
+				A( current_row, flat_index(i, j + 1, N_y, N_x) ) = C_y;
+				% flat_index(i, j + 1, ...) == current_row + 1
+			end
 		end
 		if compute_rhs
-			b( current_row ) = rhs( i/(1 + N_x), j/(1 + N_y) );
+			b( current_row ) = f( i/(1 + N_x), j/(1 + N_y) );
 		end
 	end
 end
