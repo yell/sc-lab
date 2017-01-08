@@ -12,9 +12,9 @@ Returns
 A_padded : (m + 2, n + 2) matrix
 	padded matrix.
 
-Example
--------
-A =
+Examples
+--------
+A = rand(3)
 
     0.9575    0.9706    0.8003
     0.9649    0.9572    0.1419

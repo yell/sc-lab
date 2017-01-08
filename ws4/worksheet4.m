@@ -30,7 +30,7 @@ for i = solving_methods
 	runtimes = {};
 	storages = {};
 
-	for j = 1:numel(N_xs)
+	for j = 1:1%numel(N_xs)
 
 		N_x = N_xs(j);
 		N_y = N_x;
@@ -66,7 +66,8 @@ for i = solving_methods
 
 		case 3 % solving iteratively using Gauss-Seidel method
 			t_start = tic;
-			x = B{j}; % TODO gauss_seidel_poisson(N_x, B{j})
+			[x, exitflag, iter] = gauss_seidel_poisson(N_x, B{j}, {'maxiter', 100});
+			iter
 			t_total = toc(t_start);
 			runtimes{j} = t_total;
 			num_elements = numel(B{j}) + numel(x);
@@ -74,34 +75,36 @@ for i = solving_methods
 			assert( num_elements == N + N );
 		end
 
-		% plot the solution
-		if plot_solutions
-			if j == numel(N_xs) % do not plot for N_x = 127
-				continue;
+		if i == 3 && j == 1
+			% plot the solution
+			if plot_solutions
+				if j == numel(N_xs) % do not plot for N_x = 127
+					continue;
+				end
+				T = reshape(x, [N_x, N_y]);
+				T = zero_pad(T);
+				title_str = strcat(solving_methods_strs{i}, ', N_x = ', num2str(N_x));
+				surface_plot(T, title_str);
+				contour_plot(T, title_str);
 			end
-			T = reshape(x, [N_x, N_y]);
-			T = zero_pad(T);
-			title_str = strcat(solving_methods_strs{i}, ', N_x = ', num2str(N_x));
-			surface_plot(T, title_str);
-			contour_plot(T, title_str);
 		end
 	end
 
-	% print runtime and storage
-	fprintf('\n\n');
-	fprintf('%s\n', solving_methods_strs{i});
-	fprintf(repmat('-', 1, 67));
-	fprintf('\n N_x = N_y ');
-	for j = 1:(numel(N_xs) - 1)
-		fprintf('|          %2d ', N_xs(j));
-	end
-	fprintf('\n   runtime ');
-	for j = 1:(numel(N_xs) - 1)
-		fprintf('|   %4.3e ', runtimes{j});
-	end
-	fprintf('\n   storage ');
-	for j = 1:(numel(N_xs) - 1)
-		fprintf('|    %8d ', storages{j});
-	end
-	fprintf('\n');
+	% % print runtime and storage
+	% fprintf('\n\n');
+	% fprintf('%s\n', solving_methods_strs{i});
+	% fprintf(repmat('-', 1, 67));
+	% fprintf('\n N_x = N_y ');
+	% for j = 1:(numel(N_xs) - 1)
+	% 	fprintf('|          %2d ', N_xs(j));
+	% end
+	% fprintf('\n   runtime ');
+	% for j = 1:(numel(N_xs) - 1)
+	% 	fprintf('|   %4.3e ', runtimes{j});
+	% end
+	% fprintf('\n   storage ');
+	% for j = 1:(numel(N_xs) - 1)
+	% 	fprintf('|    %8d ', storages{j});
+	% end
+	% fprintf('\n');
 end

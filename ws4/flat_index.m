@@ -10,7 +10,7 @@ m, n : positive int
 	Dimensions of matrix.
 column_major : bool, optional
 	Whether the matrix is flattened column-wisely 
-	(otherwise row-wisely).
+	(otherwise row-wisely). Default is true.
 
 Examples
 --------
@@ -43,7 +43,7 @@ if nargin < 5
 end
 
 if column_major
-	flattened_index = (i - 1) * n + j;
+	flattened_index = (i - 1) * n + (j - 1) + 1;
 else
-	flattened_index = (j - 1) * m + i;
+	flattened_index = (j - 1) * m + (i - 1) + 1;
 end

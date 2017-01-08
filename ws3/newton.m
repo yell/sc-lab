@@ -70,6 +70,7 @@ while( abs(root - x0) > xtol | abs(f1 - f0) > ftol )
 	iter = iter + 1;
 	if iter > maxiter
 		exitflag = -1;
+		iter = iter - 1;
 		return;
 	end
 

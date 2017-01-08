@@ -39,6 +39,19 @@ A : (N, N) matrix
 	The resulting matrix, N := N_x * N_y.
 b : (N,) vector, optional
 	Rhs of the linear system.
+
+Examples
+--------
+>> make_system([3, 2], {'sparse', false})
+
+ans =
+
+   -50     9     0    16     0     0
+     9   -50     9     0    16     0
+     0     9   -50     0     0    16
+    16     0     0   -50     9     0
+     0    16     0     9   -50     9
+     0     0    16     0     9   -50
 %}
 
 % set default values
@@ -108,18 +121,16 @@ for i = 1:N_y
 		if compute_A
 			A( current_row, current_row ) = -2 * (C_x + C_y);
 			if i > 1
-				A( current_row, flat_index(i - 1, j, N_y, N_x) ) = C_x;
+				A( current_row, flat_index(i - 1, j, N_y, N_x) ) = C_x; % flat_index(i - 1, j, ...) == current_row - N_x
 			end
 			if i < N_y
-				A( current_row, flat_index(i + 1, j, N_y, N_x) ) = C_x;
+				A( current_row, flat_index(i + 1, j, N_y, N_x) ) = C_x; % flat_index(i + 1, j, ...) == current_row + N_x
 			end
 			if j > 1
-				A( current_row, flat_index(i, j - 1, N_y, N_x) ) = C_y;
-				% flat_index(i, j - 1, ...) == current_row - 1
+				A( current_row, flat_index(i, j - 1, N_y, N_x) ) = C_y; % flat_index(i, j - 1, ...) == current_row - 1
 			end
 			if j < N_x
-				A( current_row, flat_index(i, j + 1, N_y, N_x) ) = C_y;
-				% flat_index(i, j + 1, ...) == current_row + 1
+				A( current_row, flat_index(i, j + 1, N_y, N_x) ) = C_y; % flat_index(i, j + 1, ...) == current_row + 1
 			end
 		end
 		if compute_rhs
