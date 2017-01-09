@@ -72,7 +72,7 @@ for i = 1:numel(num_methods)
 	fprintf('\n    error red. ');
 	for j = 1:numel(dt)
 		if j == 1
-			fprintf('|          - ', E);	
+			fprintf('|          - ');	
 		else
 			fprintf('|   %8.5f ', E(j - 1)/E(j));	
 		end

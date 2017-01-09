@@ -2,7 +2,7 @@ clc
 clear
 
 
-% rhs and its derivative
+% rhs
 f = @(x, y) (-2 * pi^2 * sin(pi * x) * sin(pi * y));
 
 % dimensions of grid
@@ -22,6 +22,8 @@ end
 % whether to plot solutions
 plot_solutions = true;
 
+% errors for Gauss-Seidel
+E = zeros(numel(N_xs), 1);
 
 % main loop
 fprintf('Computing and plotting ...\n');
@@ -30,7 +32,7 @@ for i = solving_methods
 	runtimes = {};
 	storages = {};
 
-	for j = 1:1%numel(N_xs)
+	for j = 1:numel(N_xs)
 
 		N_x = N_xs(j);
 		N_y = N_x;
@@ -62,20 +64,28 @@ for i = solving_methods
 			num_elements = nnz(A_sparse) + numel(B{j}) + numel(x);
 			storages{j} = num_elements;
 			assert( num_elements == (N_x ^ 2 + 2*N_x*(N_x - 1) + 2*N_y*(N_y - 1)) + N + N );
-			
 
 		case 3 % solving iteratively using Gauss-Seidel method
 			t_start = tic;
-			[x, exitflag, iter] = gauss_seidel_poisson(N_x, B{j}, {'maxiter', 100});
-			iter
+			[x, exitflag, iter] = gauss_seidel_poisson(N_x, B{j}, {'maxiter', 1});
+			% iter
 			t_total = toc(t_start);
 			runtimes{j} = t_total;
 			num_elements = numel(B{j}) + numel(x);
 			storages{j} = num_elements;
 			assert( num_elements == N + N );
+			% exact solution
+			T_exact = zeros(N_x, N_y);
+			for k = 1:N_x
+				for l = 1:N_y
+					T_exact(k, l) = sin(pi * k / (1 + N_x)) * sin(pi * l / (1 + N_y));
+				end
+			end
+			% error
+			E(j) = rmse(x, reshape(T_exact, [N_x * N_x, 1]));
 		end
 
-		if i == 3 && j == 1
+		if i == 3 && j == 2
 			% plot the solution
 			if plot_solutions
 				if j == numel(N_xs) % do not plot for N_x = 127
@@ -90,21 +100,42 @@ for i = solving_methods
 		end
 	end
 
-	% % print runtime and storage
-	% fprintf('\n\n');
-	% fprintf('%s\n', solving_methods_strs{i});
-	% fprintf(repmat('-', 1, 67));
-	% fprintf('\n N_x = N_y ');
-	% for j = 1:(numel(N_xs) - 1)
-	% 	fprintf('|          %2d ', N_xs(j));
-	% end
-	% fprintf('\n   runtime ');
-	% for j = 1:(numel(N_xs) - 1)
-	% 	fprintf('|   %4.3e ', runtimes{j});
-	% end
-	% fprintf('\n   storage ');
-	% for j = 1:(numel(N_xs) - 1)
-	% 	fprintf('|    %8d ', storages{j});
-	% end
-	% fprintf('\n');
+	% print runtime and storage
+	fprintf('\n\n');
+	fprintf('%s\n', solving_methods_strs{i});
+	fprintf(repmat('-', 1, 64));
+	fprintf('\n  N_x = N_y ');
+	for j = 1:(numel(N_xs) - 1)
+		fprintf('|         %2d ', N_xs(j));
+	end
+	fprintf('\n    runtime ');
+	for j = 1:(numel(N_xs) - 1)
+		fprintf('|  %4.3e ', runtimes{j});
+	end
+	fprintf('\n    storage ');
+	for j = 1:(numel(N_xs) - 1)
+		fprintf('|   %8d ', storages{j});
+	end
+	fprintf('\n');
 end
+
+% print errors and error reductions for Gauss-Seidel
+fprintf('\n%s\n', solving_methods_strs{3});
+fprintf(repmat('-', 1, 77));
+fprintf('\n  N_x = N_y ');
+for j = 1:numel(N_xs)
+	fprintf('|        %3d ', N_xs(j));
+end
+fprintf('\n      error ');
+for j = 1:numel(N_xs)
+	fprintf('| %1.4e ', E(j));
+end
+fprintf('\n error red. ');
+for j = 1:numel(N_xs)
+	if j == 1
+		fprintf('|          - ');	
+	else
+		fprintf('|   %8.5f ', E(j - 1)/E(j));	
+	end
+end
+fprintf('\n');
