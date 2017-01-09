@@ -68,7 +68,6 @@ for i = solving_methods
 		case 3 % solving iteratively using Gauss-Seidel method
 			t_start = tic;
 			[x, exitflag, iter] = gauss_seidel_poisson(N_x, B{j}, {'maxiter', 1000});
-            iter
 			t_total = toc(t_start);
 			runtimes{j} = t_total;
 			num_elements = numel(B{j}) + numel(x);
@@ -118,7 +117,7 @@ for i = solving_methods
 end
 
 % print errors and error reductions for Gauss-Seidel
-fprintf('\n%s\n', solving_methods_strs{3});
+fprintf('\n%s (max. 1000 iterations)\n', solving_methods_strs{3});
 fprintf(repmat('-', 1, 77));
 fprintf('\n  N_x = N_y ');
 for j = 1:numel(N_xs)

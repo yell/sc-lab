@@ -79,23 +79,20 @@ assert( numel(b) == N );
 	d : float
 		A_k * y.
 	%}
-		assert( numel(y) == N );
-		i = floor((k - 1) / N_x) + 1;
-		j = mod(k - 1, N_x) + 1;
-		assert( k == flat_index(i, j, N_y, N_x) );
-		d = -2 * (C_x + C_y) * y(k);
-		if i > 1
-			d = d + C_x * y( flat_index(i - 1, j, N_y, N_x) );
-		end
-		if i < N_y
-			d = d + C_x * y( flat_index(i + 1, j, N_y, N_x) );
-		end
-		if j > 1
-			d = d + C_y * y( flat_index(i, j - 1, N_y, N_x) );
-		end
-		if j < N_x
-			d = d + C_y * y( flat_index(i, j + 1, N_y, N_x) );
-		end
+	d = -2 * (C_x + C_y) * y(k);
+	[i, j] = unflat_index(k, N_y, N_x);
+	if i > 1
+		d = d + C_x * y( flat_index(i - 1, j, N_y, N_x) );
+	end
+	if i < N_y
+		d = d + C_x * y( flat_index(i + 1, j, N_y, N_x) );
+	end
+	if j > 1
+		d = d + C_y * y( flat_index(i, j - 1, N_y, N_x) );
+	end
+	if j < N_x
+		d = d + C_y * y( flat_index(i, j + 1, N_y, N_x) );
+	end
 	end
 
 % the algorithm
@@ -117,7 +114,9 @@ while( r > tol )
 		x(k) = -0.5 / (C_x + C_y) * ( b(k) - S1 - S2 );
 	end
 
-	r = rmse(b, arrayfun(@(k) a_k_x(k, x), 1:N).');
+	if mod(iter, 10) == 0 % update r only every 10 iters
+		r = rmse(b, arrayfun(@(k) a_k_x(k, x), 1:N).');
+	end
 end
 
 exitflag = 0;
