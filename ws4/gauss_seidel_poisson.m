@@ -65,9 +65,9 @@ C_y = (1 + N_y) ^ 2;
 % validate params
 assert( numel(b) == N );
 
-	function r = a_k_x(k, y)
+	function d = a_k_x(k, y)
 	%{
-	Compute the product of A's k-th row and vector `y`
+	Compute the product of k-th row of A and vector `y`.
 
 	Parameters
 	----------
@@ -76,31 +76,31 @@ assert( numel(b) == N );
 
 	Returns
 	-------
-	r : float
+	d : float
 		A_k * y.
 	%}
-		assert(numel(y) == N);
+		assert( numel(y) == N );
 		i = floor((k - 1) / N_x) + 1;
 		j = mod(k - 1, N_x) + 1;
-		assert(k == flat_index(i, j, N_y, N_x));
-		r = -2 * (C_x + C_y) * y(k);
+		assert( k == flat_index(i, j, N_y, N_x) );
+		d = -2 * (C_x + C_y) * y(k);
 		if i > 1
-			r = r + C_x * y( flat_index(i - 1, j, N_y, N_x) );
+			d = d + C_x * y( flat_index(i - 1, j, N_y, N_x) );
 		end
 		if i < N_y
-			r = r + C_x * y( flat_index(i + 1, j, N_y, N_x) );
+			d = d + C_x * y( flat_index(i + 1, j, N_y, N_x) );
 		end
 		if j > 1
-			r = r + C_y * y( flat_index(i, j - 1, N_y, N_x) );
+			d = d + C_y * y( flat_index(i, j - 1, N_y, N_x) );
 		end
 		if j < N_x
-			r = r + C_y * y( flat_index(i, j + 1, N_y, N_x) );
+			d = d + C_y * y( flat_index(i, j + 1, N_y, N_x) );
 		end
 	end
 
 % the algorithm
 iter = 0;
-x = ones(N, 1);
+x = zeros(N, 1);
 r = inf;
 
 while( r > tol )
@@ -111,13 +111,13 @@ while( r > tol )
 		return;
 	end
 
-	for i = 1:N
-		R1 = a_k_x( i, [x(1:(i - 1)); zeros(N - i + 1, 1)] );
-		R2 = a_k_x( i, [zeros(i, 1); x((i + 1):N)] );
-		x(i) = -0.5/(C_x + C_y) * ( b(i) - R1 - R2 );
+	for k = 1:N
+		S1 = a_k_x( k, [ x(1:(k - 1)); zeros(N - k + 1, 1) ] );
+		S2 = a_k_x( k, [  zeros(k, 1);        x((k + 1):N) ] );
+		x(k) = -0.5 / (C_x + C_y) * ( b(k) - S1 - S2 );
 	end
 
-	r = rmse(b, arrayfun(@(k) a_k_x(k, x), 1:N));
+	r = rmse(b, arrayfun(@(k) a_k_x(k, x), 1:N).');
 end
 
 exitflag = 0;

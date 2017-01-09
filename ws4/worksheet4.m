@@ -67,8 +67,8 @@ for i = solving_methods
 
 		case 3 % solving iteratively using Gauss-Seidel method
 			t_start = tic;
-			[x, exitflag, iter] = gauss_seidel_poisson(N_x, B{j}, {'maxiter', 1});
-			% iter
+			[x, exitflag, iter] = gauss_seidel_poisson(N_x, B{j}, {'maxiter', 1000});
+            iter
 			t_total = toc(t_start);
 			runtimes{j} = t_total;
 			num_elements = numel(B{j}) + numel(x);
@@ -85,18 +85,16 @@ for i = solving_methods
 			E(j) = rmse(x, reshape(T_exact, [N_x * N_x, 1]));
 		end
 
-		if i == 3 && j == 2
-			% plot the solution
-			if plot_solutions
-				if j == numel(N_xs) % do not plot for N_x = 127
-					continue;
-				end
-				T = reshape(x, [N_x, N_y]);
-				T = zero_pad(T);
-				title_str = strcat(solving_methods_strs{i}, ', N_x = ', num2str(N_x));
-				surface_plot(T, title_str);
-				contour_plot(T, title_str);
+		% plot the solution
+		if plot_solutions
+			if j == numel(N_xs) % do not plot for N_x = 127
+				continue;
 			end
+			T = reshape(x, [N_x, N_y]);
+			T = zero_pad(T);
+			title_str = strcat(solving_methods_strs{i}, ', N_x = ', num2str(N_x));
+			surface_plot(T, title_str);
+			contour_plot(T, title_str);
 		end
 	end
 
@@ -132,6 +130,7 @@ for j = 1:numel(N_xs)
 end
 fprintf('\n error red. ');
 for j = 1:numel(N_xs)
+    
 	if j == 1
 		fprintf('|          - ');	
 	else
