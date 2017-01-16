@@ -17,8 +17,8 @@ Returns
 E : float
 	A computed RMSE
 
-Example
--------
+Examples
+--------
 >> rmse([1 2 3], [0 0 0])
 
 ans =

@@ -63,7 +63,7 @@ for i = solving_methods
 			runtimes{j} = t_total;
 			num_elements = nnz(A_sparse) + numel(B{j}) + numel(x);
 			storages{j} = num_elements;
-			assert( num_elements == (N_x ^ 2 + 2*N_x*(N_x - 1) + 2*N_y*(N_y - 1)) + N + N );
+			assert( num_elements == (N_x * N_y + 2*N_y*(N_x - 1) + 2*N_x*(N_y - 1)) + N + N );
 
 		case 3 % solving iteratively using Gauss-Seidel method
 			t_start = tic;
@@ -98,7 +98,7 @@ for i = solving_methods
 	end
 
 	% print runtime and storage
-	fprintf('\n\n');
+	fprintf('\n');
 	fprintf('%s\n', solving_methods_strs{i});
 	fprintf(repmat('-', 1, 64));
 	fprintf('\n  N_x = N_y ');

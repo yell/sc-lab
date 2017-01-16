@@ -5,9 +5,9 @@ Plot contour plot of a marix with values evenly spaced in [0; 1] x [0; 1].
 Parameters
 ----------
 T : matrix
-	matrix to plot
+	Matrix to plot.
 title_str : string
-	title of the plot
+	Title of the plot.
 %}
 fig = figure;
 set(gcf, 'Visible', 'off');

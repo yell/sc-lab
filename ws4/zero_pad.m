@@ -1,6 +1,6 @@
 function A_padded = zero_pad(A)
 %{
-Pad matrix with zeros horizontally and vertically for both sided.
+Pad matrix with zeros horizontally and vertically for both sides.
 
 Parameters
 ----------
