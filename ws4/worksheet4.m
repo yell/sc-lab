@@ -74,12 +74,8 @@ for i = solving_methods
 			storages{j} = num_elements;
 			assert( num_elements == N + N );
 			% exact solution
-			T_exact = zeros(N_x, N_y);
-			for k = 1:N_x
-				for l = 1:N_y
-					T_exact(k, l) = sin(pi * k / (1 + N_x)) * sin(pi * l / (1 + N_y));
-				end
-			end
+			[X, Y] = meshgrid((1:N_x)/(1 + N_x), (1:N_y)/(1 + N_y));
+			T_exact = sin(pi * X) .* sin(pi * Y);
 			% error
 			E(j) = rmse(x, reshape(T_exact, [N_x * N_x, 1]));
 		end
