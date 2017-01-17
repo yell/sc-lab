@@ -51,6 +51,8 @@ for i = solving_methods
 			num_elements = numel(A) + numel(B{j}) + numel(x);
 			storages{j} = num_elements;
 			assert( num_elements == N ^ 2 + N + N );
+			T = reshape(x, [N_x, N_y]);
+			T = zero_pad(T);
 			
 		case 2 % solving using sparse matrix
 			if j == numel(N_xs) % do not compute for N_x = 127
@@ -64,20 +66,23 @@ for i = solving_methods
 			num_elements = nnz(A_sparse) + numel(B{j}) + numel(x);
 			storages{j} = num_elements;
 			assert( num_elements == (N_x * N_y + 2*N_y*(N_x - 1) + 2*N_x*(N_y - 1)) + N + N );
+			T = reshape(x, [N_x, N_y]);
+			T = zero_pad(T);
 
 		case 3 % solving iteratively using Gauss-Seidel method
+			b = reshape(B{j}, [N_y, N_x]);
 			t_start = tic;
-			[x, exitflag, iter] = gauss_seidel_poisson(N_x, B{j}, {'maxiter', 1000});
+			[T, exitflag, iter] = gauss_seidel_poisson(N_x, b, {'maxiter', 0}); % no limitations on the number of iterations!
 			t_total = toc(t_start);
 			runtimes{j} = t_total;
-			num_elements = numel(B{j}) + numel(x);
+			num_elements = numel(b) + numel(T);
 			storages{j} = num_elements;
-			assert( num_elements == N + N );
+			assert( num_elements == N + (N_x + 2) * (N_y + 2) );
 			% exact solution
-			[X, Y] = meshgrid((1:N_x)/(1 + N_x), (1:N_y)/(1 + N_y));
+			[X, Y] = meshgrid(linspace(0, 1, (2 + N_x)), linspace(0, 1, (2 + N_y)));
 			T_exact = sin(pi * X) .* sin(pi * Y);
 			% error
-			E(j) = rmse(x, reshape(T_exact, [N_x * N_x, 1]));
+			E(j) = rmse(T(:), T_exact(:));
 		end
 
 		% plot the solution
@@ -85,8 +90,6 @@ for i = solving_methods
 			if j == numel(N_xs) % do not plot for N_x = 127
 				continue;
 			end
-			T = reshape(x, [N_x, N_y]);
-			T = zero_pad(T);
 			title_str = strcat(solving_methods_strs{i}, ', N_x = ', num2str(N_x));
 			surface_plot(T, title_str);
 			contour_plot(T, title_str);
@@ -113,7 +116,7 @@ for i = solving_methods
 end
 
 % print errors and error reductions for Gauss-Seidel
-fprintf('\n%s (max. 1000 iterations)\n', solving_methods_strs{3});
+fprintf('\n%s\n', solving_methods_strs{3});
 fprintf(repmat('-', 1, 77));
 fprintf('\n  N_x = N_y ');
 for j = 1:numel(N_xs)

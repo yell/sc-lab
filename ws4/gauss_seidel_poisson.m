@@ -1,4 +1,4 @@
-function [x, exitflag, iter] = gauss_seidel_poisson(sz, b, params)
+function [T, exitflag, iter] = gauss_seidel_poisson(sz, b, params)
 %{
 Solve discretized system for Poisson equation with Dirichlet
 boundary conditions (see details in `make_system.m`) 
@@ -9,16 +9,16 @@ Parameters
 sz : positive int or (int, int) tuple
 	Govern dimensions of discretization grid.
 	`sz` == [N_x, N_y] or `sz` == [N_x], then N_y := N_x.
-b : (N,) vector
+b : (N_y, N_x) matrix
 	Rhs.
 maxiter : int, optional
 	Maximum number of iterations to perform. Default if 200.
 tol : float, optional
-	Rmse between `b` and A * `x`. Default is 1e-4.
+	RMSE between `b` and A * `x`. Default is 1e-4.
 
 Returns
 -------
-x : (N,) vector
+T : (N_y + 2, N_x + 2) matrix
 	The solution.
 exitflag : int
 	encodes the exit condition, meaning the reason `gauss_seidel` 
@@ -46,6 +46,9 @@ if nargin == 3
 		end
 	end
 end
+if maxiter <= 0
+	maxiter = inf;
+end
 
 % set some variables for convenience
 if numel(sz) == 1
@@ -57,47 +60,14 @@ elseif numel(sz) >= 2
 else
 	error('parameter `sz` cannot be empty')
 end
-
 N = N_x * N_y;
 C_x = (1 + N_x) ^ 2;
 C_y = (1 + N_y) ^ 2;
-
-% validate params
-assert( numel(b) == N );
-
-	function d = a_k_x(k, y)
-	%{
-	Compute the product of k-th row of A and vector `y`.
-
-	Parameters
-	----------
-	k : positive int
-	y : (N,) vector
-
-	Returns
-	-------
-	d : float
-		A_k * y.
-	%}
-	d = -2 * (C_x + C_y) * y(k);
-	[i, j] = unflat_index(k, N_y, N_x);
-	if i > 1
-		d = d + C_x * y( flat_index(i - 1, j, N_y, N_x) );
-	end
-	if i < N_y
-		d = d + C_x * y( flat_index(i + 1, j, N_y, N_x) );
-	end
-	if j > 1
-		d = d + C_y * y( flat_index(i, j - 1, N_y, N_x) );
-	end
-	if j < N_x
-		d = d + C_y * y( flat_index(i, j + 1, N_y, N_x) );
-	end
-	end
+tol = N * tol ^ 2; % now check SSE < tol
 
 % the algorithm
 iter = 0;
-x = zeros(N, 1);
+T = zeros(N_y + 2, N_x + 2);
 r = inf;
 
 while( r > tol )
@@ -108,14 +78,27 @@ while( r > tol )
 		return;
 	end
 
-	for k = 1:N
-		S1 = a_k_x( k, [ x(1:(k - 1)); zeros(N - k + 1, 1) ] );
-		S2 = a_k_x( k, [  zeros(k, 1);        x((k + 1):N) ] );
-		x(k) = -0.5 / (C_x + C_y) * ( b(k) - S1 - S2 );
+	% update T_{i, j}
+	for j = 2:(N_x + 1)
+		for i = 2:(N_y + 1)
+			% (i, j) are always in "genuine" domain of T
+			z = T(i, j);
+			S1 = C_y * T( i - 1, j ) + C_x * T( i, j - 1 );
+			S2 = C_y * T( i + 1, j ) + C_x * T( i, j + 1 );
+			T(i, j) = -0.5 / (C_x + C_y) * ( b(i - 1, j - 1) - S1 - S2 );
+		end
 	end
 
-	if mod(iter, 10) == 0 % update r only every 10 iters
-		r = rmse(b, arrayfun(@(k) a_k_x(k, x), 1:N).');
+	% update residual
+	r = 0;
+	for j = 2:(N_x + 1)
+		for i = 2:(N_y + 1)
+			% (i, j) are always in "genuine" domain of T
+			b_approx = - 2 * (C_x + C_y) * T(i, j) ...
+			           + C_y * T( i - 1, j ) + C_x * T( i, j - 1 ) ...
+			           + C_y * T( i + 1, j ) + C_x * T( i, j + 1 );
+			r = r + ( b(i - 1, j - 1) - b_approx ) ^ 2;
+		end
 	end
 end
 
