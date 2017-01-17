@@ -117,20 +117,20 @@ end
 % main loop
 for i = 1:N_y
 	for j = 1:N_x
-		current_row = flat_index(i, j, N_y, N_x); % == (i - 1) * N_x + j
+		current_row = flat_index(i, j, N_y, N_x); % == (i - 1) * N_x + (j - 1) + 1
 		if compute_A
 			A( current_row, current_row ) = -2 * (C_x + C_y);
 			if i > 1
-				A( current_row, flat_index(i - 1, j, N_y, N_x) ) = C_x; % flat_index(i - 1, j, ...) == current_row - N_x
+				A( current_row, current_row - N_x ) = C_x; % flat_index(i - 1, j, N_y, N_x) == current_row - N_x
 			end
 			if i < N_y
-				A( current_row, flat_index(i + 1, j, N_y, N_x) ) = C_x; % flat_index(i + 1, j, ...) == current_row + N_x
+				A( current_row, current_row + N_x ) = C_x; % flat_index(i + 1, j, N_y, N_x) == current_row + N_x
 			end
 			if j > 1
-				A( current_row, flat_index(i, j - 1, N_y, N_x) ) = C_y; % flat_index(i, j - 1, ...) == current_row - 1
+				A( current_row, current_row - 1 ) = C_y; % flat_index(i, j - 1, N_y, N_x) == current_row - 1
 			end
 			if j < N_x
-				A( current_row, flat_index(i, j + 1, N_y, N_x) ) = C_y; % flat_index(i, j + 1, ...) == current_row + 1
+				A( current_row, current_row + 1 ) = C_y; % flat_index(i, j + 1, N_y, N_x) == current_row + 1
 			end
 		end
 		if compute_rhs
