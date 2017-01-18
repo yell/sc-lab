@@ -67,7 +67,7 @@ tol = N * tol ^ 2; % now check SSE < tol
 
 % the algorithm
 iter = 0;
-T = zeros(N_y + 2, N_x + 2);
+T = zeros(N_y + 2, N_x + 2); % solution padded with zeros
 r = inf;
 
 while( r > tol )

@@ -20,7 +20,7 @@ for j = 1:numel(N_xs)
 end
 
 % whether to plot solutions
-plot_solutions = true;
+plot_solutions = false;
 
 % errors for Gauss-Seidel
 E = zeros(numel(N_xs), 1);
@@ -29,8 +29,8 @@ E = zeros(numel(N_xs), 1);
 fprintf('Computing and plotting ...\n');
 for i = solving_methods
 
-	runtimes = {};
-	storages = {};
+	runtimes = zeros(numel(N_xs), 1);
+	storages = zeros(numel(N_xs), 1);
 
 	for j = 1:numel(N_xs)
 
@@ -47,9 +47,9 @@ for i = solving_methods
 			t_start = tic;
 			x = A\B{j};
 			t_total = toc(t_start);
-			runtimes{j} = t_total;
+			runtimes(j) = t_total;
 			num_elements = numel(A) + numel(B{j}) + numel(x);
-			storages{j} = num_elements;
+			storages(j) = num_elements;
 			assert( num_elements == N ^ 2 + N + N );
 			T = reshape(x, [N_x, N_y]);
 			T = zero_pad(T);
@@ -62,9 +62,9 @@ for i = solving_methods
 			t_start = tic;
 			x = A_sparse\B{j};
 			t_total = toc(t_start);
-			runtimes{j} = t_total;
+			runtimes(j) = t_total;
 			num_elements = nnz(A_sparse) + numel(B{j}) + numel(x);
-			storages{j} = num_elements;
+			storages(j) = num_elements;
 			assert( num_elements == (N_x * N_y + 2*N_y*(N_x - 1) + 2*N_x*(N_y - 1)) + N + N );
 			T = reshape(x, [N_x, N_y]);
 			T = zero_pad(T);
@@ -74,9 +74,9 @@ for i = solving_methods
 			t_start = tic;
 			[T, exitflag, iter] = gauss_seidel_poisson(N_x, b, {'maxiter', 0}); % no limitations on the number of iterations!
 			t_total = toc(t_start);
-			runtimes{j} = t_total;
+			runtimes(j) = t_total;
 			num_elements = numel(b) + numel(T);
-			storages{j} = num_elements;
+			storages(j) = num_elements;
 			assert( num_elements == N + (N_x + 2) * (N_y + 2) );
 			% exact solution
 			[X, Y] = meshgrid(linspace(0, 1, (2 + N_x)), linspace(0, 1, (2 + N_y)));
@@ -106,11 +106,11 @@ for i = solving_methods
 	end
 	fprintf('\n    runtime ');
 	for j = 1:(numel(N_xs) - 1)
-		fprintf('|  %4.3e ', runtimes{j});
+		fprintf('|  %4.3e ', runtimes(j));
 	end
 	fprintf('\n    storage ');
 	for j = 1:(numel(N_xs) - 1)
-		fprintf('|   %8d ', storages{j});
+		fprintf('|   %8d ', storages(j));
 	end
 	fprintf('\n');
 end
