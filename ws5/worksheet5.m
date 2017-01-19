@@ -30,6 +30,7 @@ for i = 1:numel(step_methods)
 
 	% here all solutions are stored
 	T_collection = cell(numel(N_xs), numel(dts));
+	title_strs = cell(numel(N_xs), numel(dts));
 
 	% initialize all matrices
 	for j = 1:numel(N_xs)
@@ -37,6 +38,7 @@ for i = 1:numel(step_methods)
 		N_y = N_x;
 		for k = 1:numel(dts)
 			T_collection{j, k} = make_initial([N_x N_y]);
+			title_strs{j, k} = strcat('N_x=', num2str(N_xs(j)), ', dt=2^{-', num2str(k + 5), '}');
 		end
 	end
 
@@ -45,31 +47,33 @@ for i = 1:numel(step_methods)
 		% compute to arrive to corresponding `plot_times`
 		for j = 1:numel(N_xs)
 			for k = 1:numel(dts)
-				for p = 1:numel(1:int16(plot_dts(l)/dts(k)))
+				for o = 1:numel(1:int16(plot_dts(l)/dts(k)))
 					T_prev = T_collection{j, k};
 					T_collection{j, k} = step_methods{i}(T_prev, dts(k));	
 				end
 			end
 		end
 
+		
 		if plot_solutions
+			% plot together
+			title_str = strcat(step_methods_strs{i}, ...
+				               ', 8t=', num2str(plot_times(l) * 8));
+			multiple_surface_plot(T_collection, title_str, title_strs);
+
+			% ... and separately
 			if save_solutions
-				% now save each plot separately
 				for j = 1:numel(N_xs)
 					for k = 1:numel(dts)
-						if (j == 1 && k == 1 && l == 1)
-							title_str = strcat(step_methods_strs{i}, ...
-								               ', N_x=', num2str(N_xs(j)), ...
-								               ', dt=2^{-', num2str(k + 5), '}', ...
-								               ', t=', num2str(plot_times(l)));
-							surface_plot(T_collection{j, k}, title_str);
-						end
+						title_str = strcat(step_methods_strs{i}, ...
+							               ', N_x=', num2str(N_xs(j)), ...
+							               ', dt=2^{-', num2str(k + 5), '}', ...
+							               ', 8t=', num2str(plot_times(l) * 8));
+						surface_plot(T_collection{j, k}, title_str);
 					end
 				end
 			end
 		end
-
-		% and together
 	end
 end
 

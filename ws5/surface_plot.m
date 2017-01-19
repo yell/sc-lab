@@ -1,16 +1,16 @@
 function surface_plot(T, title_str)
 %{
-Plot surface plot of a marix with values evenly spaced in [0; 1] x [0; 1].
+Plot surface plot of a matrix with values evenly spaced in [0; 1] x [0; 1].
 
 Parameters
 ----------
 T : (m, n) matrix
-	matrix to plot
+	Matrix to plot.
 title_str : string
-	title of the plot
+	Title of the plot.
 %}
 fig = figure;
-set(gcf, 'Visible', 'off');
+set(fig, 'visible', 'off');
 
 [m n] = size(T);
 x = linspace(0, 1, n);
