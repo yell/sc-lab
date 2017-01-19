@@ -4,7 +4,7 @@ Plot contour plot of a marix with values evenly spaced in [0; 1] x [0; 1].
 
 Parameters
 ----------
-T : matrix
+T : (m, n) matrix
 	Matrix to plot.
 title_str : string
 	Title of the plot.
@@ -12,9 +12,9 @@ title_str : string
 fig = figure;
 set(gcf, 'Visible', 'off');
 
-[M, N] = size(T);
-x = linspace(0, 1, N);
-y = linspace(0, 1, M);
+[m n] = size(T);
+x = linspace(0, 1, n);
+y = linspace(0, 1, m);
 colormap jet;
 contour(x, y, T);
 colorbar;

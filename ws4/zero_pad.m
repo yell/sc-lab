@@ -5,16 +5,16 @@ Pad matrix with zeros horizontally and vertically for both sides.
 Parameters
 ----------
 A : (m, n) matrix
-	matrix to pad
+	Matrix to pad.
 
 Returns
 -------
 A_padded : (m + 2, n + 2) matrix
-	padded matrix.
+	Padded matrix.
 
 Examples
 --------
-A = rand(3)
+>> A = rand(3)
 
     0.9575    0.9706    0.8003
     0.9649    0.9572    0.1419

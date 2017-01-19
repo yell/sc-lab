@@ -46,12 +46,12 @@ Examples
 
 ans =
 
-   -50     9     0    16     0     0
-     9   -50     9     0    16     0
-     0     9   -50     0     0    16
-    16     0     0   -50     9     0
-     0    16     0     9   -50     9
-     0     0    16     0     9   -50
+   -50     9    16     0     0     0
+     9   -50     0    16     0     0
+    16     0   -50     9    16     0
+     0    16     9   -50     0    16
+     0     0    16     0   -50     9
+     0     0     0    16     9   -50
 %}
 
 % set default values
@@ -115,22 +115,22 @@ else
 end
 
 % main loop
-for i = 1:N_y
-	for j = 1:N_x
-		current_row = flat_index(i, j, N_y, N_x); % == (i - 1) * N_x + (j - 1) + 1
+for j = 1:N_y
+	for i = 1:N_x
+		current_row = flat_index(i, j, N_x, N_y); % == (i - 1) * N_y + (j - 1) + 1
 		if compute_A
 			A( current_row, current_row ) = -2 * (C_x + C_y);
 			if i > 1
-				A( current_row, current_row - N_x ) = C_x; % flat_index(i - 1, j, N_y, N_x) == current_row - N_x
+				A( current_row, current_row - N_y ) = C_x; % flat_index(i - 1, j, N_x, N_y) == current_row - N_y
 			end
-			if i < N_y
-				A( current_row, current_row + N_x ) = C_x; % flat_index(i + 1, j, N_y, N_x) == current_row + N_x
+			if i < N_x
+				A( current_row, current_row + N_y ) = C_x; % flat_index(i + 1, j, N_x, N_y) == current_row + N_y
 			end
 			if j > 1
-				A( current_row, current_row - 1 ) = C_y; % flat_index(i, j - 1, N_y, N_x) == current_row - 1
+				A( current_row, current_row - 1 ) = C_y;   % flat_index(i, j - 1, N_x, N_y) == current_row - 1
 			end
-			if j < N_x
-				A( current_row, current_row + 1 ) = C_y; % flat_index(i, j + 1, N_y, N_x) == current_row + 1
+			if j < N_y
+				A( current_row, current_row + 1 ) = C_y;   % flat_index(i, j + 1, N_x, N_y) == current_row + 1
 			end
 		end
 		if compute_rhs

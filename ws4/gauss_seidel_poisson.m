@@ -9,7 +9,7 @@ Parameters
 sz : positive int or (int, int) tuple
 	Govern dimensions of discretization grid.
 	`sz` == [N_x, N_y] or `sz` == [N_x], then N_y := N_x.
-b : (N_y, N_x) matrix
+b : (N_x, N_y) matrix
 	Rhs.
 maxiter : int, optional
 	Maximum number of iterations to perform. Default if 200.
@@ -18,7 +18,7 @@ tol : float, optional
 
 Returns
 -------
-T : (N_y + 2, N_x + 2) matrix
+T : (N_x + 2, N_y + 2) matrix
 	The solution.
 exitflag : int
 	encodes the exit condition, meaning the reason `gauss_seidel` 
@@ -79,24 +79,24 @@ while( r > tol )
 	end
 
 	% update T_{i, j}
-	for j = 2:(N_x + 1)
-		for i = 2:(N_y + 1)
+	for j = 2:(N_y + 1)
+		for i = 2:(N_x + 1)
 			% (i, j) are always in "genuine" domain of T
 			z = T(i, j);
-			S1 = C_y * T( i - 1, j ) + C_x * T( i, j - 1 );
-			S2 = C_y * T( i + 1, j ) + C_x * T( i, j + 1 );
+			S1 = C_x * T( i - 1, j ) + C_y * T( i, j - 1 );
+			S2 = C_x * T( i + 1, j ) + C_y * T( i, j + 1 );
 			T(i, j) = -0.5 / (C_x + C_y) * ( b(i - 1, j - 1) - S1 - S2 );
 		end
 	end
 
 	% update residual
 	r = 0;
-	for j = 2:(N_x + 1)
-		for i = 2:(N_y + 1)
+	for j = 2:(N_y + 1)
+		for i = 2:(N_x + 1)
 			% (i, j) are always in "genuine" domain of T
-			b_approx = - 2 * (C_x + C_y) * T(i, j) ...
-			           + C_y * T( i - 1, j ) + C_x * T( i, j - 1 ) ...
-			           + C_y * T( i + 1, j ) + C_x * T( i, j + 1 );
+            b_approx = - 2 * (C_x + C_y) * T(i, j) ...
+			           + C_x * T( i - 1, j ) + C_y * T( i, j - 1 ) ...
+			           + C_x * T( i + 1, j ) + C_y * T( i, j + 1 );
 			r = r + ( b(i - 1, j - 1) - b_approx ) ^ 2;
 		end
 	end
