@@ -5,7 +5,7 @@ clear
 % some control variables
 plot_solutions = true;
 save_solutions = true;
-explicit_euler = false;
+explicit_euler = true;
 implicit_euler = true;
 
 % spatial resolutions
@@ -15,8 +15,8 @@ N_xs = 2 .^ (2:5) - 1; % 3, 7, ..., 31
 plot_times = (1:4)/8;
 plot_dts = diff([0, plot_times]);
 
-
 fprintf('WARNING: do NOT close figures very quickly, \n         they need to be saved (at least that with subplots)!\n\n');
+
 
 % 
 %
@@ -55,14 +55,14 @@ if explicit_euler
 					T_prev = T_collection{j, k};
 					T_collection{j, k} = step_method(T_prev, dts(k));	
 				end
-			end
-			% save separate plots as soon as available
-			if plot_solutions && save_solutions
-				title_str = strcat(step_method_str, ...
-					               ', N_x=', num2str(N_xs(j)), ...
-					               ', dt=2^{-', num2str(k + 5), '}', ...
-					               ', 8t=', num2str(plot_times(l) * 8));
-				surface_plot(T_collection{j, k}, title_str);
+				% save separate plots as soon as available
+				if plot_solutions && save_solutions
+					title_str = strcat(step_method_str, ...
+						               ', N_x=', num2str(N_xs(j)), ...
+						               ', dt=2^{-', num2str(k + 5), '}', ...
+						               ', 8t=', num2str(plot_times(l) * 8));
+					surface_plot(T_collection{j, k}, title_str);
+				end
 			end
 		end
 
@@ -104,7 +104,7 @@ end % explicit_euler
 
 if implicit_euler
 
-	step_method = @explicit_euler_step;
+	step_method = @implicit_euler_step;
 	step_method_str = 'Implicit Euler';
 	fprintf('\nComputing and plotting %s ...\n\n', step_method_str);
 
@@ -142,12 +142,10 @@ if implicit_euler
 			end
 			% save separate plots as soon as available
 			if plot_solutions && save_solutions
-				if (j == 1) % TODO: remove
-					title_str = strcat(step_method_str, ...
-						               ', N_x=', num2str(N_xs(j)), ...
-						               ', dt=2^{-6}, 8t=', num2str(plot_times(l) * 8));
-					surface_plot(T_collection{j, l}, title_str);
-				end
+				title_str = strcat(step_method_str, ...
+					               ', N_x=', num2str(N_xs(j)), ...
+					               ', dt=2^{-6}, 8t=', num2str(plot_times(l) * 8));
+				surface_plot(T_collection{j, l}, title_str);
 			end
 		end
 	end
@@ -157,6 +155,5 @@ if implicit_euler
 		title_str = strcat(step_method_str, ', dt=2^{-6}');
 		multiple_surface_plot(T_collection, title_str, title_strs);
 	end
-
 
 end % implicit_euler

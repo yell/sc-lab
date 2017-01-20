@@ -21,8 +21,8 @@ Returns
 T : (N_x + 2, N_y + 2) matrix
 	The solution.
 exitflag : int
-	encodes the exit condition, meaning the reason `gauss_seidel` 
-	stopped its iteratons.
+	encodes the exit condition, meaning the reason 
+	`gauss_seidel_poisson` stopped its iteratons.
 	 0 : success
 	-1 : maximum number of iterations reached
 iter : int
@@ -82,7 +82,6 @@ while( r > tol )
 	for j = 2:(N_y + 1)
 		for i = 2:(N_x + 1)
 			% (i, j) are always in "genuine" domain of T
-			z = T(i, j);
 			S1 = C_x * T( i - 1, j ) + C_y * T( i, j - 1 );
 			S2 = C_x * T( i + 1, j ) + C_y * T( i, j + 1 );
 			T(i, j) = -0.5 / (C_x + C_y) * ( b(i - 1, j - 1) - S1 - S2 );

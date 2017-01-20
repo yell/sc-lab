@@ -1,7 +1,7 @@
 function [T_next] = explicit_euler_step(T_prev, dt)
 %{
-Perform one step of Explicit Euler for spatially 
-discretized heat equation:
+Perform one step of explicit Euler method 
+for spatially discretized heat equation:
 
 	T_t = T_xx + T_yy
 
@@ -18,7 +18,7 @@ dt : positive float
 Returns
 -------
 T_next : (N_x + 2, N_y + 2) matrix
-	Computed solution for the next time step `t` + `dt`.
+	Computed solution for the next time step (`t` + `dt`).
 %}
 
 [m n] = size(T_prev);
