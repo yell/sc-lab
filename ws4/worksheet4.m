@@ -20,7 +20,7 @@ for j = 1:numel(N_xs)
 end
 
 % whether to plot solutions
-plot_solutions = true;
+plot_solutions = false;
 
 % errors for Gauss-Seidel
 E = zeros(numel(N_xs), 1);
