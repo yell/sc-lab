@@ -49,4 +49,4 @@ else
 	error('parameter `sz` cannot be empty')
 end
 
-T_init = zero_pad(ones(N_x, N_y));
+T_init = padarray(ones(N_x, N_y), [1, 1]);

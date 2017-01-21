@@ -52,7 +52,7 @@ for i = solving_methods
 			storages(j) = num_elements;
 			assert( num_elements == N ^ 2 + N + N );
 			T = reshape(x, [N_x, N_y]);
-			T = zero_pad(T);
+			T = padarray(T, [1, 1]);
 			
 		case 2 % solving using sparse matrix
 			if j == numel(N_xs) % do not compute for N_x = 127
@@ -67,7 +67,7 @@ for i = solving_methods
 			storages(j) = num_elements;
 			assert( num_elements == (N_x * N_y + 2*N_y*(N_x - 1) + 2*N_x*(N_y - 1)) + N + N );
 			T = reshape(x, [N_x, N_y]);
-			T = zero_pad(T);
+			T = padarray(T, [1, 1]);
 
 		case 3 % solving iteratively using Gauss-Seidel method
 			b = reshape(B{j}, [N_y, N_x]);
